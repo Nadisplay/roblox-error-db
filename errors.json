@@ -1,0 +1,17 @@
+{
+  "version": "1.0",
+  "errors": [
+    {
+      "id": "N001",
+      "title": "Attempt to index nil",
+      "messagePattern": "attempt to index nil",
+      "priority": 5,
+      "keywords": ["nil", "index"],
+      "description": "Trying to access something that doesn't exist.",
+      "fixes": [
+        "Use WaitForChild()",
+        "Check if variable exists"
+      ]
+    }
+  ]
+}
