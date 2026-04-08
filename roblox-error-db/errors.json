@@ -1,0 +1,506 @@
+{
+  "version": "2.4",
+  "errors": [
+    {
+      "id": "LUA_INDEX_NIL",
+      "title": "attempt to index nil with '…'",
+      "messagePattern": "attempt to index nil",
+      "priority": 5,
+      "confidenceBoost": 1.2,
+      "keywords": ["nil", "index", "waitforchild", "findfirstchild", "instance", "replication"],
+      "description": "Standard Luau runtime error in Roblox Studio: you used . or : on nil (missing instance, FindFirstChild returned nil, or value not ready yet).",
+      "fixes": [
+        "Guard with if x then … end before indexing",
+        "Use WaitForChild(\"Name\") (and a timeout) instead of assuming the child exists",
+        "Check spelling and that the object is parented before you read it"
+      ]
+    },
+    {
+      "id": "RBX_FIND_FIRST_CHILD",
+      "title": "FindFirstChild returned nil",
+      "messagePattern": "findfirstchild",
+      "priority": 3,
+      "keywords": ["nil", "findfirstchild", "waitforchild", "child", "instance", "hierarchy"],
+      "description": "Stack or context mentions FindFirstChild—often the next line is attempt to index nil because the result was not checked.",
+      "fixes": [
+        "Check if result exists before using it: local c = parent:FindFirstChild(\"X\"); if c then … end",
+        "Use WaitForChild(\"X\") when the object must exist (with a timeout if needed)"
+      ]
+    },
+    {
+      "id": "LUA_TABLE_NIL_INDEX",
+      "title": "table index is nil",
+      "messagePattern": "table index is nil",
+      "priority": 5,
+      "keywords": ["table", "nil", "dictionary", "key", "index"],
+      "description": "Luau error when nil is used as a table key in an operation that does not allow it.",
+      "fixes": [
+        "Ensure the key variable is set before t[key] = … or t[key]",
+        "Use a sentinel or default key only if your logic allows it"
+      ]
+    },
+    {
+      "id": "LUA_ARITH_NIL",
+      "title": "attempt to perform arithmetic on nil",
+      "messagePattern": "perform arithmetic on nil",
+      "priority": 5,
+      "keywords": ["nil", "math", "number", "intvalue", "value", "arithmetic"],
+      "description": "Luau error when +, -, *, /, etc. involve nil (often an uninitialized stat or missing Value object).",
+      "fixes": [
+        "Default with x = x or 0 only when that makes sense",
+        "Ensure IntValue/NumberValue exists before reading .Value",
+        "Validate with typeof(x) == \"number\" before math"
+      ]
+    },
+    {
+      "id": "LUA_CONCAT_NIL",
+      "title": "attempt to concatenate nil with string",
+      "messagePattern": "attempt to concatenate",
+      "priority": 5,
+      "keywords": ["nil", "string", "concat", "tostring", "format"],
+      "description": "Luau error when building a string with .. and one side is nil.",
+      "fixes": [
+        "Use tostring(x) or (x or \"\") when building messages",
+        "Check the variable is set before concatenating"
+      ]
+    },
+    {
+      "id": "LUA_LEN_NIL",
+      "title": "attempt to get length of a nil value",
+      "messagePattern": "length of nil",
+      "priority": 5,
+      "keywords": ["nil", "#", "table", "string", "length"],
+      "description": "Luau error when # is used on nil (table or string was never assigned).",
+      "fixes": [
+        "Ensure the table exists before #t",
+        "Use if t then local n = #t end"
+      ]
+    },
+    {
+      "id": "RBX_INVALID_MEMBER",
+      "title": "… is not a valid member of …",
+      "messagePattern": "is not a valid member",
+      "priority": 5,
+      "confidenceBoost": 1.2,
+      "keywords": ["member", "typo", "waitforchild", "datamodel", "workspace", "replication"],
+      "description": "Roblox DataModel error: wrong property/child name, wrong class, or the instance is not parented where you think.",
+      "fixes": [
+        "Fix spelling and capitalization (names are case-sensitive)",
+        "Use FindFirstChild / WaitForChild for children; use correct API for properties",
+        "Confirm you're indexing the right Instance type (check ClassName)"
+      ]
+    },
+    {
+      "id": "RBX_INFINITE_YIELD",
+      "title": "Infinite yield possible on '…'",
+      "messagePattern": "infinite yield possible",
+      "priority": 5,
+      "keywords": ["waitforchild", "yield", "timing", "timeout", "child", "studio"],
+      "description": "Roblox Studio warning: WaitForChild (or similar) waited past the threshold because the child never appeared.",
+      "fixes": [
+        "Ensure the instance is created under the parent you expect",
+        "Pass a timeout: WaitForChild(\"X\", timeoutSeconds)",
+        "Fix typos in child names and replication order (server creates before client waits)"
+      ]
+    },
+    {
+      "id": "RBX_WAITFORCHILD_TIMEOUT",
+      "title": "WaitForChild timeout / long wait",
+      "messagePattern": "waitforchild",
+      "priority": 2,
+      "keywords": ["waitforchild", "timeout", "yield", "child", "hierarchy", "replication"],
+      "description": "The line mentions WaitForChild—often a hang, slow replication, or missing child (Studio may also show Infinite yield possible for the same issue).",
+      "fixes": [
+        "Use WaitForChild(\"X\", timeLimitSeconds) so the call fails fast instead of hanging",
+        "Ensure the server (or owning side) creates and parents the instance before the client waits",
+        "Confirm the child name spelling and that it is not destroyed before the wait completes"
+      ]
+    },
+    {
+      "id": "LUA_PARENT_NIL",
+      "title": "The Parent property of … is nil, current parent: …",
+      "messagePattern": "parent is nil",
+      "priority": 4,
+      "keywords": ["parent", "nil", "hierarchy", "instance", "unparent"],
+      "description": "Appears when parenting or hierarchy logic assumes a Parent that is not set (or object was unparented).",
+      "fixes": [
+        "Parent the instance to Workspace or a folder before relying on the tree",
+        "Check obj.Parent before walking up the tree"
+      ]
+    },
+    {
+      "id": "LUA_BAD_ARG",
+      "title": "bad argument #… to '…' (…)",
+      "messagePattern": "bad argument #",
+      "priority": 5,
+      "keywords": ["argument", "type", "api", "signature", "typeof"],
+      "description": "Luau error: wrong type, order, or count of arguments to a built-in or engine function.",
+      "fixes": [
+        "Read the Roblox API page for that function's signature",
+        "Print typeof() for each argument",
+        "Avoid passing nil where an Instance, string, or number is required"
+      ]
+    },
+    {
+      "id": "LUA_INVALID_ARG",
+      "title": "invalid argument #… to '…'",
+      "messagePattern": "invalid argument",
+      "priority": 5,
+      "keywords": ["argument", "type", "range", "validation"],
+      "description": "Luau error: argument rejected (often type or range) for a C/API function.",
+      "fixes": [
+        "Match the documented parameter types",
+        "Validate numbers are finite and in range before calling"
+      ]
+    },
+    {
+      "id": "LUA_MISSING_ARG",
+      "title": "missing argument #… to '…'",
+      "messagePattern": "missing argument",
+      "priority": 4,
+      "keywords": ["argument", "parameter", "optional"],
+      "description": "Luau error: a required parameter was omitted.",
+      "fixes": [
+        "Pass all required arguments in order",
+        "Check for optional overloads in the docs"
+      ]
+    },
+    {
+      "id": "RBX_SCRIPT_TIMEOUT",
+      "title": "Script timeout: exhausted allowed execution time",
+      "messagePattern": "script timeout",
+      "priority": 5,
+      "keywords": ["loop", "freeze", "performance", "task.wait", "while"],
+      "description": "Roblox: your script ran too long in one go (tight loop or heavy work without yielding).",
+      "fixes": [
+        "Add task.wait() or break work across Heartbeat/Stepped",
+        "Avoid infinite while true with no yield",
+        "Profile and move heavy work out of hot paths"
+      ]
+    },
+    {
+      "id": "RBX_EXEC_EXHAUST",
+      "title": "Execution of script exhausted allowed execution time",
+      "messagePattern": "exhausted allowed execution time",
+      "priority": 5,
+      "keywords": ["loop", "performance", "yield", "task.defer"],
+      "description": "Roblox: same class of issue as script timeout—too much synchronous work.",
+      "fixes": [
+        "Yield periodically in loops",
+        "Split work with task.defer / task.spawn where appropriate"
+      ]
+    },
+    {
+      "id": "RBX_REMOTE_FIRESERVER",
+      "title": "FireServer can only be called from the client",
+      "messagePattern": "fireserver can only be called from the client",
+      "priority": 5,
+      "keywords": ["remoteevent", "fireserver", "client", "server", "localscript", "networking"],
+      "description": "Roblox networking: FireServer was called from a server Script; only LocalScripts (client) may call FireServer.",
+      "fixes": [
+        "Move FireServer into a LocalScript under PlayerGui / StarterPlayer / character",
+        "On the server, listen with OnServerEvent instead of firing from server to fake client calls"
+      ]
+    },
+    {
+      "id": "RBX_REMOTE_FIRECLIENT",
+      "title": "FireClient can only be called from the server",
+      "messagePattern": "fireclient can only be called from the server",
+      "priority": 5,
+      "keywords": ["remoteevent", "fireclient", "client", "server", "script", "networking"],
+      "description": "Roblox: FireClient/FireAllClients must run in a server Script, not a LocalScript.",
+      "fixes": [
+        "Call FireClient from ServerScriptService or another server script",
+        "Have the client ask the server via FireServer, then server fires back"
+      ]
+    },
+    {
+      "id": "RBX_REMOTE_FIREALL",
+      "title": "FireAllClients can only be called from the server",
+      "messagePattern": "fireallclients can only be called from the server",
+      "priority": 5,
+      "keywords": ["remoteevent", "fireallclients", "server", "script", "networking"],
+      "description": "Roblox: same rule as FireClient—all-client remotes are server-only.",
+      "fixes": [
+        "Run FireAllClients from a Script, not a LocalScript"
+      ]
+    },
+    {
+      "id": "RBX_REMOTE_INVOKE_SERVER",
+      "title": "InvokeServer can only be called from the client",
+      "messagePattern": "invokeserver can only be called from the client",
+      "priority": 5,
+      "keywords": ["remotefunction", "invokeserver", "client", "server", "onserverinvoke", "networking"],
+      "description": "Roblox: RemoteFunction:InvokeServer is client-only; the server uses OnServerInvoke.",
+      "fixes": [
+        "Call InvokeServer from a LocalScript",
+        "On server, assign function to OnServerInvoke and return values to the client"
+      ]
+    },
+    {
+      "id": "LUA_DIV_ZERO",
+      "title": "divide by zero",
+      "messagePattern": "divide by zero",
+      "priority": 5,
+      "keywords": ["math", "zero", "division", "denominator"],
+      "description": "Luau arithmetic error when denominator is 0.",
+      "fixes": [
+        "Check if d ~= 0 before dividing",
+        "Clamp or skip the operation when invalid"
+      ]
+    },
+    {
+      "id": "LUA_SYNTAX_UNEXPECTED",
+      "title": "unexpected symbol near '…'",
+      "messagePattern": "unexpected symbol",
+      "priority": 4,
+      "keywords": ["syntax", "parse", "editor", "then", "end", "near"],
+      "description": "Luau parse error: the parser hit a token it did not expect at that position.",
+      "fixes": [
+        "Click the error line in the script editor and match if/then/end, function/end, do/end",
+        "Check quotes and commas in tables",
+        "Fix typos near the column the parser points to"
+      ]
+    },
+    {
+      "id": "LUA_SYNTAX_EXPECTED",
+      "title": "Expected … (parse error)",
+      "messagePattern": "expected",
+      "priority": 2,
+      "keywords": ["syntax", "parse", "editor", "identifier", "expression", "missing", "token"],
+      "description": "Luau parse error mentioning expected tokens, e.g. ')' expected (to close '(' at line X) or Expected identifier when parsing expression. The word unexpected contains expected as a substring—use higher priority than this row for unexpected-symbol lines (see LUA_SYNTAX_UNEXPECTED).",
+      "fixes": [
+        "Close open brackets, strings, or blocks",
+        "Add missing then, end, do, or comma in tables",
+        "Fix typos where the parser points"
+      ]
+    },
+    {
+      "id": "LUA_CALL_NIL",
+      "title": "attempt to call a nil value",
+      "messagePattern": "attempt to call a nil value",
+      "priority": 5,
+      "keywords": ["function", "nil", "callback", "require", "module"],
+      "description": "Luau error: you used () on something that is nil (missing module export, unset callback, or wrong variable).",
+      "fixes": [
+        "Ensure the function was assigned before calling",
+        "Check require() actually returned your module table with that method",
+        "Search for typos in the function name"
+      ]
+    },
+    {
+      "id": "G002",
+      "title": "attempt to call a … value",
+      "messagePattern": "attempt to call a",
+      "priority": 0,
+      "keywords": ["function", "type", "call", "typeof", "callback"],
+      "description": "Fallback Luau error: call () on a non-function type (number, table, Instance, boolean, etc.). Pattern has no trailing space; prefer LUA_CALL_NIL when the line is attempt to call a nil value.",
+      "fixes": [
+        "Confirm you are not overwriting a function with data",
+        "Use typeof(f) == \"function\" before calling unknown values"
+      ],
+      "fallback": true
+    },
+    {
+      "id": "LUA_COMPARE",
+      "title": "attempt to compare nil with number / incompatible types",
+      "messagePattern": "attempt to compare",
+      "priority": 5,
+      "keywords": ["nil", "compare", "ordering", "type"],
+      "description": "Luau error: ordering or comparison with nil or incompatible types.",
+      "fixes": [
+        "Compare to nil explicitly: if x == nil then …",
+        "Convert types before comparing (<, >) when needed"
+      ]
+    },
+    {
+      "id": "RBX_MODULE_RETURN",
+      "title": "Module code did not return exactly one value",
+      "messagePattern": "module code did not return exactly one value",
+      "priority": 5,
+      "keywords": ["modulescript", "require", "return", "export"],
+      "description": "Roblox ModuleScript error: the file must return exactly one value (usually one table).",
+      "fixes": [
+        "End the module with return M (single table/object)",
+        "Remove code paths that return nothing or return multiple values",
+        "Avoid bare return with no value on the main path"
+      ]
+    },
+    {
+      "id": "RBX_MODULE_REQ_ERR",
+      "title": "Requested module experienced an error while loading",
+      "messagePattern": "requested module experienced an error",
+      "priority": 5,
+      "keywords": ["require", "modulescript", "load", "error"],
+      "description": "Roblox: require() failed because the required ModuleScript errored during load.",
+      "fixes": [
+        "Open the module path from the stack trace and fix the inner error first",
+        "Use pcall(require) if you need to handle failure"
+      ]
+    },
+    {
+      "id": "RBX_MODULE_CYCLE",
+      "title": "circular dependency detected while calling require()",
+      "messagePattern": "circular dependency",
+      "priority": 5,
+      "keywords": ["require", "modulescript", "dependency", "cycle"],
+      "description": "Roblox: two or more ModuleScripts require each other in a cycle.",
+      "fixes": [
+        "Move shared code into a third module both can require",
+        "Lazy-require inside a function after load completes",
+        "Restructure so modules only depend one way"
+      ]
+    },
+    {
+      "id": "LUA_STACK_OVERFLOW",
+      "title": "stack overflow",
+      "messagePattern": "stack overflow",
+      "priority": 5,
+      "keywords": ["recursion", "stack", "depth"],
+      "description": "Luau: call depth exceeded—usually infinite or very deep recursion.",
+      "fixes": [
+        "Add a base case to recursion",
+        "Rewrite as a loop",
+        "Check accidental self-calls"
+      ]
+    },
+    {
+      "id": "RBX_DESTROYED",
+      "title": "… has been destroyed",
+      "messagePattern": "has been destroyed",
+      "priority": 5,
+      "keywords": ["destroy", "instance", "parent", "cleanup"],
+      "description": "Roblox: code used an Instance after Destroy() or after it left the game.",
+      "fixes": [
+        "Disconnect connections and clear references on cleanup",
+        "Check obj.Parent or obj:IsDescendantOf(game) before use",
+        "Avoid storing Instances long after gameplay moves on"
+      ]
+    },
+    {
+      "id": "RBX_HTTP_DISABLED",
+      "title": "HttpService is not enabled",
+      "messagePattern": "httpservice is not enabled",
+      "priority": 5,
+      "keywords": ["httpservice", "http", "settings", "security"],
+      "description": "Roblox: Game Settings disallow HttpService requests.",
+      "fixes": [
+        "Studio: Game Settings > Security > enable Allow HTTP requests",
+        "Published game: enable the same in the place’s settings on the website"
+      ]
+    },
+    {
+      "id": "RBX_HTTP_ERROR",
+      "title": "HttpError: … (HttpService request failed)",
+      "messagePattern": "httperror:",
+      "priority": 4,
+      "keywords": ["httpservice", "http", "request", "status"],
+      "description": "Roblox HttpService: request failed (status, TLS, timeout, or policy). The suffix names the failure kind.",
+      "fixes": [
+        "Check URL, Method, and Headers",
+        "Whitelist domains if your game uses that feature",
+        "Retry on transient errors with backoff"
+      ]
+    },
+    {
+      "id": "RBX_HTTP_CONNECTFAIL",
+      "title": "HttpError: ConnectFail",
+      "messagePattern": "connectfail",
+      "priority": 4,
+      "keywords": ["httpservice", "network", "dns", "tls"],
+      "description": "Roblox could not open a TCP/TLS connection to the host.",
+      "fixes": [
+        "Verify hostname and https://",
+        "Confirm the API is online",
+        "Check firewall / DNS issues outside Roblox if testing endpoints yourself"
+      ]
+    },
+    {
+      "id": "RBX_API_REJECT",
+      "title": "502: API Services rejected request with error. HttpError: …",
+      "messagePattern": "api services rejected request",
+      "priority": 5,
+      "keywords": ["datastore", "http", "502", "api", "backend"],
+      "description": "Roblox backend rejected the request (overload, maintenance, or invalid request). Often seen with DataStore or cloud APIs.",
+      "fixes": [
+        "Retry with exponential backoff",
+        "Reduce request rate and payload size",
+        "Confirm experience has API access (published place, settings)"
+      ]
+    },
+    {
+      "id": "RBX_THROTTLED",
+      "title": "Request was throttled",
+      "messagePattern": "request was throttled",
+      "priority": 5,
+      "keywords": ["throttle", "datastore", "rate", "limit"],
+      "description": "Roblox rate-limited the operation (DataStore or similar high-volume usage).",
+      "fixes": [
+        "Spread reads/writes over time",
+        "Cache on the server",
+        "Use UpdateAsync and avoid redundant SetAsync in loops"
+      ]
+    },
+    {
+      "id": "LUAU_UNABLE_CAST",
+      "title": "Unable to cast … to …",
+      "messagePattern": "unable to cast",
+      "priority": 5,
+      "keywords": ["type", "cast", "strict", "luau", "conversion"],
+      "description": "Luau typed mode / engine conversion: value could not convert to the expected type.",
+      "fixes": [
+        "Validate or construct the correct type before passing in",
+        "For Instances, check ClassName:IsA(\"ExpectedClass\")"
+      ]
+    },
+    {
+      "id": "RBX_LOCALPLAYER_SERVER",
+      "title": "LocalPlayer is not a valid member of Players \"Players\"",
+      "messagePattern": "localplayer is not a valid member of players",
+      "priority": 5,
+      "keywords": ["localplayer", "players", "server", "client", "context"],
+      "description": "Roblox: Players.LocalPlayer is nil on the server; only the client has a local player.",
+      "fixes": [
+        "Use the Player from PlayerAdded / event parameters on the server",
+        "Put LocalPlayer-only code in a LocalScript",
+        "Use remotes to ask the server with explicit player argument"
+      ]
+    },
+    {
+      "id": "RBX_CLIENT_ONLY_API",
+      "title": "… can only be used on the client",
+      "messagePattern": "can only be used on the client",
+      "priority": 5,
+      "keywords": ["client", "context", "localscript", "security"],
+      "description": "Roblox security/context: this API is restricted to the client session.",
+      "fixes": [
+        "Move the call to a LocalScript under an allowed container",
+        "Mirror state to the server with remotes if needed"
+      ]
+    },
+    {
+      "id": "RBX_SERVER_ONLY_API",
+      "title": "… can only be used on the server",
+      "messagePattern": "can only be used on the server",
+      "priority": 5,
+      "keywords": ["server", "context", "script", "security"],
+      "description": "Roblox security/context: this API must run in a server Script.",
+      "fixes": [
+        "Move logic to ServerScriptService (or another server script)",
+        "Have the client request the action via RemoteEvent/RemoteFunction"
+      ]
+    },
+    {
+      "id": "LUA_YIELD_BOUNDARY",
+      "title": "attempt to yield across metamethod/C-call boundary",
+      "messagePattern": "yield across",
+      "priority": 4,
+      "keywords": ["yield", "wait", "metamethod", "task.wait"],
+      "description": "Classic Luau error when task.wait/yield runs in a context that cannot yield (some metamethods and engine call paths).",
+      "fixes": [
+        "Defer with task.defer or RunService events instead of waiting inside __index/__newindex",
+        "Restructure so waits happen in normal thread execution"
+      ]
+    }
+  ]
+}
